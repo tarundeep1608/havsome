@@ -1,22 +1,21 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
 import {
   LayoutDashboard,
-  ClipboardList,
+  PlusCircle,
   UtensilsCrossed,
   Receipt,
-  LogOut,
   Menu,
   X,
-  PlusCircle,
+  LogOut,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 const navItems = [
-  { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
-  { path: '/admin/manual-order', icon: PlusCircle, label: 'New Order' },
-  { path: '/admin/menu', icon: UtensilsCrossed, label: 'Menu' },
-  { path: '/admin/billing', icon: Receipt, label: 'Billing' },
+  { path: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { path: '/admin/menu', label: 'Menu', icon: UtensilsCrossed },
+  { path: '/admin/manual-order', label: 'Manual Order', icon: PlusCircle },
+  { path: '/admin/billing', label: 'Billing', icon: Receipt },
 ];
 
 export default function AdminLayout() {
@@ -30,42 +29,34 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen flex bg-surface-100">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
+    <div className="min-h-screen bg-slate-100 text-slate-900">
+      {sidebarOpen ? (
         <div
-          className="fixed inset-0 bg-surface-950/40 z-40 lg:hidden backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
-      )}
+      ) : null}
 
-      {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 flex flex-col transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } bg-white border-r border-surface-200 shadow-sm`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-slate-200 bg-white shadow-md transition-transform duration-300 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
       >
-        {/* Logo & Brand */}
-        <div className="p-6 flex items-center gap-4 border-b border-surface-200">
-          <img src="/logo.png" alt="Havsome" className="w-12 h-12 rounded-xl shadow-sm" />
-          <div>
-            <h1 className="text-xl font-bold text-surface-950" style={{ fontFamily: 'var(--font-display)' }}>
-              Havsome
-            </h1>
-            <p className="text-xs uppercase tracking-widest text-surface-500 font-semibold mt-0.5">
-              Admin Panel
-            </p>
+        <div className="flex items-center gap-3 border-b border-slate-200 px-5 py-5">
+          <img src="/logo.png" alt="Havsome" className="h-11 w-11 rounded-xl shadow-sm" />
+          <div className="min-w-0">
+            <p className="truncate text-lg font-bold text-slate-900">Havsome</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Admin Console</p>
           </div>
           <button
-            className="ml-auto lg:hidden p-2 bg-surface-100 rounded-lg text-surface-500 hover:text-surface-900"
             onClick={() => setSidebarOpen(false)}
+            className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 lg:hidden"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-6 px-4 flex flex-col gap-2">
+        <nav className="flex-1 space-y-1.5 px-3 py-5">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
@@ -73,63 +64,67 @@ export default function AdminLayout() {
               end={item.end}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all duration-200 border border-transparent ${
+                `flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-all duration-200 hover:scale-[1.01] ${
                   isActive
-                    ? 'bg-primary-50 text-primary-600 border-primary-200 shadow-sm'
-                    : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'
+                    ? 'bg-primary-50 text-primary-700 shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`
               }
             >
-              <item.icon size={20} />
+              <item.icon size={18} />
               {item.label}
             </NavLink>
           ))}
         </nav>
 
-        {/* User & Logout */}
-        <div className="p-5 border-t border-surface-200 bg-surface-50">
-          <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-primary-600 text-white shadow-sm">
+        <div className="border-t border-slate-200 bg-slate-50 p-4">
+          <div className="mb-3 flex items-center gap-3 rounded-xl bg-white p-3">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white">
               {user?.email?.[0]?.toUpperCase() || 'A'}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-surface-900 truncate">{user?.email || 'Admin'}</p>
-              <p className="text-xs font-semibold text-surface-500 mt-0.5">Administrator</p>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-800">{user?.email || 'admin@havsome'}</p>
+              <p className="text-xs text-slate-500">Administrator</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white border border-surface-200 text-surface-700 font-bold text-sm hover:bg-danger hover:text-white hover:border-danger transition-colors shadow-sm"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition-all duration-200 hover:scale-[1.01] hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
           >
-            <LogOut size={18} />
+            <LogOut size={16} />
             Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 min-h-screen flex flex-col relative overflow-hidden">
-        {/* Mobile header */}
-        <header
-          className="lg:hidden flex items-center gap-3 px-5 py-4 sticky top-0 z-30 bg-white border-b border-surface-200 shadow-sm"
-        >
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 bg-surface-100 rounded-lg text-surface-600 hover:text-surface-900 transition-colors"
-          >
-            <Menu size={20} />
-          </button>
-          <img src="/logo.png" alt="Havsome" className="w-8 h-8 rounded-lg shadow-sm" />
-          <h1 className="text-base font-bold text-surface-950" style={{ fontFamily: 'var(--font-display)' }}>
-            Havsome Admin
-          </h1>
+      <div className="lg:pl-72">
+        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors duration-200 hover:bg-slate-200 lg:hidden"
+              >
+                <Menu size={20} />
+              </button>
+              <div>
+                <p className="text-sm font-semibold text-slate-500">Restaurant Operations</p>
+                <p className="text-lg font-bold text-slate-900">Management Dashboard</p>
+              </div>
+            </div>
+
+            <span className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">
+              Live
+            </span>
+          </div>
         </header>
 
-        {/* Page Content */}
-        <div className="flex-1 p-5 lg:p-8 overflow-auto h-full">
-          <Outlet />
-        </div>
-      </main>
+        <main className="px-4 py-5 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
